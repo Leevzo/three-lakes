@@ -252,14 +252,22 @@ function readMsg(m) {
   if (typeof d === 'number') d = { s: d };
   return d && d.s >= 1 && d.s <= S.length ? { s: d.s, play: !!d.play, time: m.time } : null;
 }
+let lastPlay = null;
 function follow(d) {
   if (MODE === 'present' || !d) return;
+  lastPlay = d.play ? d : null;
   if (d.s - 1 !== cur) go(d.s - 1, true);
   if (S[cur].t === 'video' && d.play) {
     const v = vid(cur), offset = Math.max(0, Date.now() / 1000 - d.time);
     if (v && v.paused && (!v.duration || offset < v.duration)) playClip(cur, offset < 2 ? 0 : offset);
   }
 }
+/* a phone that was asleep or in the background picks the clip up at the right moment when it comes back */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden || MODE === 'present') return;
+  if (lastPlay && lastPlay.s - 1 === cur && S[cur].t === 'video') follow(lastPlay);
+  catchUp();
+});
 let lastId = null;
 async function catchUp() {
   try {
