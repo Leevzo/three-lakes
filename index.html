@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Treasure of Three Lakes Ranch</title>
+<meta name="description" content="Levi Judson Harris and Lon Child on Brandt Child and the treasure of Three Lakes Ranch.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&family=Zilla+Slab:wght@600;700&family=Libre+Baskerville:ital,wght@0,400;1,400&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* One look: family prints mounted on deep lake teal; the book's gold (#faa512) for the section cards. */
+:root {
+  color-scheme: dark;
+  --lake: #0F3942;
+  --lake-deep: #0B2C33;
+  --cream: #F6F1E4;
+  --mist: #D9E6E6;
+  --gold: #FAA512;
+  --ink: #141414;
+  --display: 'Rye', 'Rockwell Extra Bold', Georgia, serif;
+  --slab: 'Zilla Slab', Rockwell, 'American Typewriter', Georgia, serif;
+  --book: 'Libre Baskerville', Baskerville, Georgia, serif;
+  --type: 'Courier Prime', 'Courier New', monospace;
+}
+html, body { height: 100%; }
+body { margin: 0; background: var(--lake-deep); color: var(--cream); font-family: var(--book); overflow: hidden; -webkit-font-smoothing: antialiased; }
+#room { position: relative; height: 100%; width: 100%; overflow: hidden; background: var(--lake-deep); cursor: pointer; }
+#stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; background: var(--lake); overflow: hidden; }
+.slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity .5s ease, visibility 0s linear .5s; background: var(--lake);
+  background-image: radial-gradient(ellipse at 30% 40%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%); }
+.slide.on { opacity: 1; visibility: visible; transition: opacity .5s ease; }
+.slide.on .print, .slide.on .row figure { animation: settle .7s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes settle { from { transform: translateY(18px) rotate(calc(var(--tilt, 0deg) * 2.2)); opacity: .0; } to { transform: rotate(var(--tilt, 0deg)); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .slide, .slide.on { transition: none; } .slide.on .print, .slide.on .row figure { animation: none; } }
+
+/* a photo as a print: cream border, soft shadow, a little tilt */
+.print { display: block; transform: rotate(var(--tilt, 0deg)); }
+.print img { display: block; border: 18px solid var(--cream); border-bottom-width: 26px; box-shadow: 0 28px 60px rgba(0,0,0,.45), 0 4px 10px rgba(0,0,0,.25); background: #000; }
+
+.tag { font-family: var(--type); font-weight: 700; font-size: 28px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+.h { font-family: var(--slab); font-weight: 700; font-size: 80px; line-height: 1.04; color: var(--cream); margin: 0; text-wrap: balance; }
+.body { font-family: var(--book); font-size: 38px; line-height: 1.48; color: var(--mist); margin: 0; text-wrap: pretty; }
+.body.q { font-style: italic; color: var(--cream); }
+.src { font-family: var(--type); font-size: 24px; letter-spacing: .06em; color: var(--gold); margin: 0; }
+
+/* story: print left, words right */
+.story .pw { position: absolute; left: 70px; top: 60px; bottom: 60px; width: 1060px; display: flex; align-items: center; justify-content: center; }
+.story .pw img { max-width: 1000px; max-height: 880px; }
+.story .words { position: absolute; left: 1210px; right: 110px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; gap: 32px; }
+
+/* gallery: a spread of prints */
+.gallery .top { position: absolute; left: 110px; right: 110px; top: 120px; display: flex; flex-direction: column; gap: 16px; }
+.gallery .h { font-size: 76px; }
+.gallery .row { position: absolute; left: 90px; right: 90px; top: 360px; bottom: 70px; display: flex; gap: 48px; align-items: center; justify-content: center; }
+.gallery figure { margin: 0; flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; justify-content: center; transform: rotate(var(--tilt, 0deg)); }
+.gallery figure img { max-width: 100%; max-height: 100%; border: 14px solid var(--cream); border-bottom-width: 20px; box-shadow: 0 24px 50px rgba(0,0,0,.45); background: #000; }
+
+/* plan: print left, list right */
+.plan ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.plan li { font-family: var(--book); font-size: 36px; line-height: 1.3; color: var(--cream); padding-left: 36px; position: relative; }
+.plan li::before { content: ''; position: absolute; left: 0; top: .45em; width: 14px; height: 14px; background: var(--gold); transform: rotate(45deg); }
+
+/* gold cards: section openers and the refuge statement */
+.card { background: var(--gold); background-image: none; color: var(--ink); }
+.card .tag { color: var(--ink); }
+.card .words { position: absolute; left: 130px; top: 0; bottom: 0; width: 1000px; display: flex; flex-direction: column; justify-content: center; gap: 34px; }
+.card.solo .words { width: 1500px; }
+.card .d { font-family: var(--display); font-size: 150px; line-height: 1; color: var(--ink); margin: 0; text-wrap: balance; }
+.card .sub { font-family: var(--book); font-style: italic; font-size: 44px; line-height: 1.4; color: var(--ink); margin: 0; }
+.card .pw { position: absolute; right: 90px; top: 60px; bottom: 60px; width: 640px; display: flex; align-items: center; justify-content: center; }
+.card .pw img { max-width: 600px; max-height: 860px; }
+.card.statement .pw { left: 80px; right: auto; width: 820px; }
+.card.statement .pw img { max-width: 780px; max-height: 820px; }
+.card.statement .words { left: 1000px; right: 110px; width: auto; }
+.card.statement .d { font-size: 118px; line-height: 1.04; }
+
+/* clips, framed like a print */
+.video .vw { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.video .yt { height: 880px; width: 1173px; border: 16px solid var(--cream); border-bottom-width: 22px; box-shadow: 0 28px 60px rgba(0,0,0,.45); background: #000 center/cover no-repeat; display: block; }
+.video .yt iframe { width: 100%; height: 100%; border: 0; display: block; }
+.video .veil { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; transition: opacity .5s ease; }
+.video .play { display: flex; align-items: center; gap: 28px; background: rgba(15,57,66,.88); padding: 26px 40px; border-radius: 999px; }
+.video .tri { width: 0; height: 0; border-left: 58px solid var(--gold); border-top: 36px solid transparent; border-bottom: 36px solid transparent; }
+.video .len { font-family: var(--type); font-weight: 700; font-size: 36px; color: var(--cream); letter-spacing: .08em; }
+.video.playing .veil { opacity: 0; }
+.video.paused .veil { opacity: 1; }
+
+/* cover and questions */
+.cover .pw { position: absolute; right: 110px; top: 60px; bottom: 60px; width: 720px; display: flex; align-items: center; justify-content: center; }
+.cover .pw img { max-width: 680px; max-height: 900px; }
+.cover .words { position: absolute; left: 130px; top: 0; bottom: 0; width: 960px; display: flex; flex-direction: column; justify-content: center; gap: 44px; }
+.cover .d { font-family: var(--display); font-size: 128px; line-height: 1.02; color: var(--cream); margin: 0; }
+.cover .d span { color: var(--gold); }
+.cover .by { font-family: var(--book); font-style: italic; font-size: 46px; color: var(--mist); margin: 0; }
+.cover .by b { font-style: normal; font-weight: 400; color: var(--cream); }
+.cover .get { display: flex; align-items: center; gap: 40px; }
+.cover #qr { width: 300px; height: 300px; flex: none; border: 14px solid var(--cream); background: var(--cream); }
+.cover #qr img, .cover #qr canvas { width: 300px; height: 300px; display: block; }
+.cover .link { font-family: var(--type); font-weight: 700; font-size: 34px; color: var(--gold); margin: 0; word-break: break-all; }
+
+/* controls */
+#bar { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); opacity: 0; transition: opacity .3s ease; pointer-events: none; }
+#room.awake #bar, #bar:focus-within { opacity: 1; pointer-events: auto; }
+#bar button { font: 700 15px/1 var(--type); color: var(--cream); background: rgba(11,44,51,.85); border: 1px solid rgba(246,241,228,.25); border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+#bar button:hover { border-color: var(--gold); color: var(--gold); }
+#bar button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+#count { font: 700 14px/1 var(--type); color: var(--mist); background: rgba(11,44,51,.85); padding: 11px 14px; border-radius: 999px; font-variant-numeric: tabular-nums; min-width: 84px; text-align: center; }
+#hint { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); font: 700 14px/1.2 var(--type); letter-spacing: .06em; color: var(--mist); background: rgba(11,44,51,.85); padding: 10px 16px; border-radius: 999px; transition: opacity .6s ease; pointer-events: none; text-align: center; max-width: calc(100% - 32px); }
+#hint.gone { opacity: 0; }
+</style></head>
+<body>
+<div id="room" tabindex="0" aria-label="The Treasure of Three Lakes Ranch, slideshow">
+  <div id="stage"></div>
+  <div id="hint">Click or → to advance · ← back · F full screen</div>
+  <div id="bar">
+    <button id="prev" type="button" aria-label="Previous slide">‹ Back</button>
+    <span id="count">1 / 1</span>
+    <button id="next" type="button" aria-label="Next slide">Next ›</button>
+    <button id="full" type="button" aria-label="Full screen">Full screen</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="slides.js"></script>
+<script>
+const stage = document.getElementById('stage'), room = document.getElementById('room');
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const I = k => `img/${k}.jpg`;
+const TILTS = [-1.6, 1.3, -0.9, 1.8, -1.2, 0.8];
+const print = (k, i, alt, big) => `<div class="pw"><figure class="print" style="--tilt:${TILTS[i % TILTS.length]}deg"><img src="${I(k)}" alt="${esc(alt || '')}"${big ? ` style="width:${big}px;height:auto"` : ''}></figure></div>`;
+
+let section = '';
+function build(s, i) {
+  const el = document.createElement('section');
+  el.className = 'slide ' + s.t;
+  if (s.t === 'section') section = s.h;
+  if (s.t === 'statement') section = 'Refuge and Resort';
+  const tag = section ? `<div class="tag">${esc(section)}</div>` : '';
+  let h = '';
+  switch (s.t) {
+    case 'cover':
+    case 'end':
+      el.className = 'slide cover';
+      h = `${print('cover-front', 1, 'The book cover')}
+        <div class="words">${s.t === 'end'
+          ? `<h1 class="d">Questions?</h1><p class="by">The Treasure of Three Lakes Ranch, <b>third edition</b></p>
+             ${BOOK ? `<div class="get"><div id="qr" aria-label="QR code for the book"></div><p class="link">${esc(BOOK.replace(/^https?:\/\//, ''))}</p></div>` : ''}`
+          : `<h1 class="d">The Treasure of <span>Three Lakes</span> Ranch</h1><p class="by">by <b>Levi Judson Harris</b> &amp; <b>Lon Child</b></p>`}</div>`;
+      break;
+    case 'story':
+      h = `${print(s.img, i, s.h, s.big)}<div class="words">${tag}<h2 class="h">${esc(s.h)}</h2>
+        ${s.body.map((x, j) => `<p class="body${s.q && j === 0 ? ' q' : ''}">${esc(x)}</p>`).join('')}
+        ${s.src2 ? `<p class="src">${esc(s.src2)}</p>` : ''}</div>`;
+      break;
+    case 'section':
+      el.className = 'slide card' + (s.img ? '' : ' solo');
+      h = `${s.img ? print(s.img, i + 1, s.h) : ''}<div class="words"><h2 class="d">${esc(s.h)}</h2><p class="sub">${esc(s.sub)}</p></div>`;
+      break;
+    case 'statement':
+      el.className = 'slide card statement';
+      h = `${print(s.img, i, 'The Child family at the lake')}<div class="words"><h2 class="d">${esc(s.h)}</h2><p class="sub">${esc(s.sub)}</p></div>`;
+      break;
+    case 'gallery':
+      h = `<div class="top">${tag}<h2 class="h">${esc(s.h)}</h2><p class="body">${esc(s.sub)}</p></div>
+        <div class="row">${s.imgs.map((k, j) => `<figure style="--tilt:${TILTS[(i + j) % TILTS.length]}deg"><img src="${I(k)}" alt=""></figure>`).join('')}</div>`;
+      break;
+    case 'plan':
+      el.className = 'slide story plan';
+      h = `${print(s.img, i, 'Three Lakes')}<div class="words">${tag}<h2 class="h">${esc(s.h)}</h2><p class="body">${esc(s.sub)}</p>
+        <ul>${s.list.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
+      break;
+    case 'video':
+      h = `<div class="vw"><div class="yt" style="background-image:url('https://img.youtube.com/vi/${s.yt}/hqdefault.jpg')"></div></div>`;
+      break;
+  }
+  el.innerHTML = h;
+  stage.appendChild(el);
+  return el;
+}
+const els = S.map(build);
+if (BOOK && window.QRCode) {
+  try { new QRCode(document.getElementById('qr'), { text: BOOK, width: 300, height: 300, colorDark: '#0F3942', colorLight: '#F6F1E4', correctLevel: QRCode.CorrectLevel.M }); } catch (e) {}
+}
+
+/* ---- fitting the 1920x1080 stage to any screen ---- */
+function fit() {
+  const W = room.clientWidth, H = room.clientHeight, g = W < 700 ? 16 : 0;
+  const k = Math.min((W - 2 * g) / 1920, (H - 2 * g) / 1080);
+  stage.style.transform = `translate(${(W - 1920 * k) / 2}px, ${(H - 1080 * k) / 2}px) scale(${k})`;
+}
+addEventListener('resize', fit); new ResizeObserver(fit).observe(room); fit();
+
+/* ---- the documentary clips: YouTube players, loaded one slide ahead, unloaded after ---- */
+const clip = { started: false };
+function ytBox(i) { return S[i] && S[i].t === 'video' ? els[i].querySelector('.yt') : null; }
+function loadClip(i) {
+  const box = ytBox(i); if (!box || box.firstChild) return;
+  const s = S[i];
+  const src = `https://www.youtube.com/embed/${s.yt}?start=${s.start}&end=${s.end}&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
+  box.innerHTML = `<iframe src="${src}" title="Myth Hunters: The Curse of Montezuma’s Gold" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+}
+function unloadClip(i) { const box = ytBox(i); if (box) box.innerHTML = ''; }
+function ytCommand(i, func) {
+  const f = ytBox(i) && ytBox(i).querySelector('iframe');
+  if (f && f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: [] }), '*');
+}
+/* clicking inside the player moves focus into it; count that as started and take the keys back */
+addEventListener('blur', () => {
+  setTimeout(() => {
+    if (document.activeElement && document.activeElement.tagName === 'IFRAME') { clip.started = true; document.activeElement.blur(); room.focus({ preventScroll: true }); }
+  }, 150);
+});
+
+/* ---- live: tell Lon's page which slide is up ---- */
+let liveTimer = null;
+function announce(n) {
+  clearTimeout(liveTimer);
+  liveTimer = setTimeout(() => {
+    fetch(`https://ntfy.sh/${LIVE_TOPIC}`, { method: 'POST', body: String(n + 1), keepalive: true }).catch(() => {});
+  }, 350);
+}
+
+/* ---- moving between slides ---- */
+let cur = 0;
+function go(n, quiet) {
+  n = Math.max(0, Math.min(S.length - 1, n));
+  if (n === cur && els[cur].classList.contains('on')) return;
+  els[cur].classList.remove('on');
+  for (let i = 0; i < S.length; i++) if (S[i].t === 'video' && Math.abs(i - n) > 1) unloadClip(i);
+  if (S[cur].t === 'video' && cur !== n) ytCommand(cur, 'pauseVideo');
+  cur = n;
+  els[cur].classList.add('on');
+  clip.started = false;
+  loadClip(cur); loadClip(cur + 1);
+  document.getElementById('count').textContent = `${cur + 1} / ${S.length}`;
+  try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+  if (!quiet) announce(cur);
+}
+function forward() {
+  if (S[cur].t === 'video' && !clip.started) { clip.started = true; ytCommand(cur, 'playVideo'); return; }
+  go(cur + 1);
+}
+
+function full() {
+  try {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else { const p = document.documentElement.requestFullscreen ? document.documentElement.requestFullscreen() : null; if (p && p.catch) p.catch(() => {}); }
+  } catch (e) {}
+}
+room.addEventListener('click', e => {
+  if (e.target.closest('#bar')) return;
+  room.focus({ preventScroll: true });
+  const r = room.getBoundingClientRect();
+  if (e.clientX - r.left < r.width * 0.2) go(cur - 1); else forward();
+});
+document.getElementById('prev').addEventListener('click', () => go(cur - 1));
+document.getElementById('next').addEventListener('click', () => go(cur + 1));
+document.getElementById('full').addEventListener('click', full);
+addEventListener('keydown', e => {
+  const k = e.key;
+  if (['ArrowRight', 'PageDown', ' ', 'Enter', 'ArrowDown'].includes(k)) { e.preventDefault(); forward(); }
+  else if (['ArrowLeft', 'PageUp', 'ArrowUp'].includes(k)) { e.preventDefault(); go(cur - 1); }
+  else if (k === 'Home') go(0);
+  else if (k === 'End') go(S.length - 1);
+  else if (k === 'f' || k === 'F') full();
+});
+let t; const wake = () => { room.classList.add('awake'); clearTimeout(t); t = setTimeout(() => room.classList.remove('awake'), 1800); };
+room.addEventListener('mousemove', wake);
+let sx = null;
+room.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+room.addEventListener('touchend', e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; sx = null;
+  if (Math.abs(dx) > 50) { e.preventDefault(); dx < 0 ? go(cur + 1) : go(cur - 1); } });
+setTimeout(() => document.getElementById('hint').classList.add('gone'), 4000);
+
+const start = parseInt((location.hash || '#1').slice(1), 10);
+cur = isNaN(start) ? 0 : Math.max(0, Math.min(S.length - 1, start - 1));
+els[cur].classList.add('on'); loadClip(cur); loadClip(cur + 1);
+document.getElementById('count').textContent = `${cur + 1} / ${S.length}`;
+announce(cur);
+</script>
+</body>
+</html>
