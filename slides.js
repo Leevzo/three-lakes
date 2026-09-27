@@ -75,7 +75,7 @@ const S = [
 
 { t:'gallery', h:'Treasure hunters', sub:'Brandt Child, and Lon Child. Like his father before him.', imgs:['i19','i58'] },
 
-{ t:'plan', img:'i13', h:'Our plan to get Three Lakes back', sub:'Lon’s adventure ranch resort. Proceeds from the book go to Lon’s mission.',
+{ t:'plan', img:'i13', h:'Our mission', sub:'Getting the story out. Proceeds from the book go to Lon’s mission.',
   list:['Zip-lines and a ropes course','A via ferrata climbing route','Ice climbing on the winter ice walls','Disc golf','A lodge and cabins','Montezuma treasure tours'] },
 
 { t:'end', cue:'The book · Questions',
