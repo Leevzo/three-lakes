@@ -124,6 +124,7 @@ body { margin: 0; background: var(--lake-deep); color: var(--cream); font-family
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="slides.js"></script>
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
 const stage = document.getElementById('stage'), room = document.getElementById('room');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
@@ -192,20 +193,25 @@ function fit() {
 }
 addEventListener('resize', fit); new ResizeObserver(fit).observe(room); fit();
 
-/* ---- the documentary clips: YouTube players, loaded one slide ahead, unloaded after ---- */
+/* ---- the documentary clips: YouTube players through YouTube's own API, made one slide ahead, removed after ---- */
 const clip = { started: false };
+const players = {};
+let ytReady = false;
+window.onYouTubeIframeAPIReady = () => { ytReady = true; loadClip(cur); loadClip(cur + 1); };
 function ytBox(i) { return S[i] && S[i].t === 'video' ? els[i].querySelector('.yt') : null; }
 function loadClip(i) {
-  const box = ytBox(i); if (!box || box.firstChild) return;
+  const box = ytBox(i); if (!box || players[i] || !ytReady) return;
   const s = S[i];
-  const src = `https://www.youtube.com/embed/${s.yt}?start=${s.start}&end=${s.end}&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(location.origin)}`;
-  box.innerHTML = `<iframe src="${src}" title="Myth Hunters: The Curse of Montezuma’s Gold" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+  const holder = document.createElement('div'); box.appendChild(holder);
+  players[i] = new YT.Player(holder, {
+    width: '100%', height: '100%', videoId: s.yt,
+    playerVars: { start: s.start, end: s.end, rel: 0, modestbranding: 1, playsinline: 1, origin: location.origin },
+    events: { onReady: e => { players[i].ready = true; if (players[i].wantPlay) e.target.playVideo(); } }
+  });
 }
-function unloadClip(i) { const box = ytBox(i); if (box) box.innerHTML = ''; }
-function ytCommand(i, func) {
-  const f = ytBox(i) && ytBox(i).querySelector('iframe');
-  if (f && f.contentWindow) f.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: [] }), '*');
-}
+function unloadClip(i) { if (players[i]) { try { players[i].destroy(); } catch (e) {} delete players[i]; const box = ytBox(i); if (box) box.innerHTML = ''; } }
+function playClip(i) { const p = players[i]; if (!p) return; if (p.ready) p.playVideo(); else p.wantPlay = true; }
+function pauseClip(i) { const p = players[i]; if (p && p.ready) { try { p.pauseVideo(); } catch (e) {} } }
 /* clicking inside the player moves focus into it; count that as started and take the keys back */
 addEventListener('blur', () => {
   setTimeout(() => {
@@ -229,7 +235,7 @@ function go(n, quiet) {
   if (n === cur && els[cur].classList.contains('on')) return;
   els[cur].classList.remove('on');
   for (let i = 0; i < S.length; i++) if (S[i].t === 'video' && Math.abs(i - n) > 1) unloadClip(i);
-  if (S[cur].t === 'video' && cur !== n) ytCommand(cur, 'pauseVideo');
+  if (S[cur].t === 'video' && cur !== n) pauseClip(cur);
   cur = n;
   els[cur].classList.add('on');
   clip.started = false;
@@ -239,7 +245,7 @@ function go(n, quiet) {
   if (!quiet) announce(cur);
 }
 function forward() {
-  if (S[cur].t === 'video' && !clip.started) { clip.started = true; ytCommand(cur, 'playVideo'); return; }
+  if (S[cur].t === 'video' && !clip.started) { clip.started = true; playClip(cur); return; }
   go(cur + 1);
 }
 
