@@ -46,11 +46,29 @@ li.now { background: var(--gold); color: var(--ink); }
 li.now .n { color: var(--ink); }
 li.clip .t { font-style: italic; }
 .foot { margin-top: 26px; font-size: 14px; color: var(--dim); }
+.timer { margin-top: 12px; display: flex; align-items: center; gap: 12px; padding: 8px 10px 8px 14px; border-radius: 12px; background: rgba(246,241,228,.07); }
+.timer .clock { font-family: 'Zilla Slab', Rockwell, Georgia, serif; font-weight: 700; font-size: 34px; line-height: 1; color: var(--cream); font-variant-numeric: tabular-nums; min-width: 96px; }
+.timer .note { flex: 1; font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+.timer button { font: 700 15px/1 'Courier Prime', monospace; letter-spacing: .06em; border-radius: 999px; padding: 11px 16px; cursor: pointer; border: 0; }
+.timer #tGo { background: var(--gold); color: var(--ink); }
+.timer #tReset { background: transparent; color: var(--mist); border: 1px solid rgba(246,241,228,.25); padding: 10px 12px; }
+.timer.running .clock { color: var(--gold); }
+.timer.low { background: rgba(250,165,18,.18); }
+.timer.done { background: var(--gold); }
+.timer.done .clock, .timer.done .note { color: var(--ink); }
+.timer.done #tReset { color: var(--ink); border-color: rgba(20,20,20,.35); }
+.timer button:focus-visible { outline: 2px solid var(--cream); outline-offset: 2px; }
 </style>
 </head>
 <body>
 <header>
   <div class="top"><h1>Three Lakes</h1><div class="live" id="live"><i></i><span id="liveText">Connecting</span></div></div>
+  <div class="timer" id="timer">
+    <span class="clock" id="tClock" role="timer" aria-live="off">45:00</span>
+    <span class="note" id="tNote">45-minute talk</span>
+    <button type="button" id="tGo">Start</button>
+    <button type="button" id="tReset" aria-label="Reset the timer to 45 minutes">Reset</button>
+  </div>
   <div class="now" aria-live="polite">
     <div class="lbl" id="nowLbl">Up now</div>
     <div class="title" id="nowTitle">Title</div>
@@ -115,6 +133,30 @@ function listen() {
 }
 catchUp(); listen();
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { catchUp(); keepAwake(); } });
+
+/* the 45-minute timer: counts from a saved start time, so it stays right if the phone sleeps or the page reloads */
+const TALK = 45 * 60 * 1000, KEY = 'three-lakes-timer';
+let tm = { start: null, pausedLeft: TALK };
+try { const saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved) tm = saved; } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(tm)); } catch (e) {} };
+const left = () => tm.start ? tm.pausedLeft - (Date.now() - tm.start) : tm.pausedLeft;
+function drawTimer() {
+  const ms = left(), neg = ms < 0, sec = Math.ceil(Math.abs(ms) / 1000);
+  const m = Math.floor(sec / 60), s2 = String(sec % 60).padStart(2, '0');
+  document.getElementById('tClock').textContent = (neg ? '+' : '') + m + ':' + s2;
+  const el = document.getElementById('timer');
+  el.classList.toggle('running', !!tm.start);
+  el.classList.toggle('low', ms > 0 && ms <= 5 * 60 * 1000);
+  el.classList.toggle('done', ms <= 0);
+  document.getElementById('tNote').textContent = ms <= 0 ? 'Time’s up' : tm.start ? (ms <= 5 * 60 * 1000 ? 'Five minutes left' : 'Running') : (ms < TALK ? 'Paused' : '45-minute talk');
+  document.getElementById('tGo').textContent = tm.start ? 'Pause' : (ms < TALK ? 'Resume' : 'Start');
+}
+document.getElementById('tGo').addEventListener('click', () => {
+  if (tm.start) { tm.pausedLeft = left(); tm.start = null; } else { tm.start = Date.now(); }
+  save(); drawTimer(); keepAwake();
+});
+document.getElementById('tReset').addEventListener('click', () => { tm = { start: null, pausedLeft: TALK }; save(); drawTimer(); });
+drawTimer(); setInterval(drawTimer, 500);
 
 /* keep the phone's screen on while this page is open, where the phone allows it */
 let lock = null;
