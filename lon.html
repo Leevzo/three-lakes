@@ -32,10 +32,10 @@ h1 { font-family: 'Rye', Georgia, serif; font-weight: 400; font-size: 21px; marg
 .live.on i { background: var(--gold); box-shadow: 0 0 0 0 rgba(250,165,18,.7); animation: pulse 2s infinite; }
 @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(250,165,18,.6); } 70% { box-shadow: 0 0 0 10px rgba(250,165,18,0); } 100% { box-shadow: 0 0 0 0 rgba(250,165,18,0); } }
 @media (prefers-reduced-motion: reduce) { .live.on i { animation: none; } }
-.now { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
-.now .lbl { font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
-.now .title { font-family: 'Zilla Slab', Rockwell, Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.1; color: var(--cream); text-wrap: balance; }
-.now .next { font-size: 16px; color: var(--mist); }
+header .now { margin-top: 12px; display: flex; flex-direction: column; gap: 4px; }
+header .now .lbl { font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold); }
+header .now .title { font-family: 'Zilla Slab', Rockwell, Georgia, serif; font-weight: 700; font-size: 30px; line-height: 1.1; color: var(--cream); text-wrap: balance; }
+header .now .next { font-size: 16px; color: var(--mist); }
 main { padding: 10px 18px calc(40px + env(safe-area-inset-bottom, 0px)); }
 h2 { font-family: 'Zilla Slab', Rockwell, Georgia, serif; font-weight: 700; font-size: 14px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin: 22px 0 6px; }
 ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
