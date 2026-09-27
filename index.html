@@ -271,7 +271,7 @@ function unlock() {
 /* ---- live: the presenter announces; everyone else follows ---- */
 let liveTimer = null, liveSeq = 0;
 function announce(msg, now) {
-  if (MODE !== 'present' || location.protocol === 'file:') return;
+  if (MODE !== 'present') return;
   clearTimeout(liveTimer);
   const seq = ++liveSeq;
   const send = (tries) => {
