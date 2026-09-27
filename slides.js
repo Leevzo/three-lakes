@@ -1,4 +1,4 @@
-/* The Treasure of Three Lakes Ranch: one list of slides, read by the slideshow (index.html)
+/* The Treasure of Three Lakes: one list of slides, read by the slideshow (index.html)
    and by Lon's live page (lon.html), so the two always match. */
 
 /* The live channel the slideshow announces its slide on (ntfy.sh, free, no account). */
@@ -20,7 +20,7 @@ const S = [
 
 { t:'story', img:'i20', h:'The treasure bug', body:['It started with a tape. A friend gave Brandt a recording of Kanab’s treasure legend, and he was hooked.'] },
 
-{ t:'story', img:'i13', h:'The bottomless lake', body:['The legend pointed him to a lake that Kanab’s old-timers swore had no bottom. Brandt’s rope hit bottom at 35 feet, the exact depth a magazine said the Aztecs used to hide gold.'] },
+{ t:'story', img:'i13', h:'The bottomless lake', body:['A magazine claimed the Aztecs hid their gold in lakes 35 feet deep. Kanab’s old-timers swore Three Lakes had no bottom, but Brandt’s rope hit bottom at exactly 35 feet.'] },
 
 { t:'story', img:'i25', h:'The lost propeller', body:['So his lawyer, Tony Thurber, dove in. He came up with the boat propeller Brandt had lost, and news of a carving on the cliff underwater.'] },
 
@@ -36,7 +36,7 @@ const S = [
 
 { t:'story', img:'snail', h:'The golden snail', body:['Before the first blast, the government found an endangered snail in his pond, valued at $50,000 a snail. Brandt sued the United States Government and fought for four years.'] },
 
-{ t:'story', img:'i55', h:'The ducks and geese', body:['In the middle of that fight, someone left twelve pet ducks and geese on the lake, and ducks eat snails. When officials came to shoot them, Brandt called the newspaper.'] },
+{ t:'story', img:'i55', h:'The ducks and geese', body:['In the middle of that fight, someone left twelve pet ducks and geese on the lake, and ducks eat snails. When officials were sent to shoot them, Brandt called the newspaper.'] },
 
 { t:'story', img:'i22', h:'The Dynamite Period', body:['Then came the dynamite. For two months Brandt and his son Robert blasted the cliff, and the rock soaked it up like rubber. Their biggest blast, 45 sticks, nearly ran the county recorder off the highway.'] },
 
@@ -46,17 +46,17 @@ const S = [
 
 { t:'story', img:'i1', h:'The man on the knoll', body:['A technician scanning for metal saw a man in full Indian dress, holding a spear, on the knoll. Then he was gone. Over the cavern, the needle jumped to 100.'] },
 
-{ t:'story', img:'i2', h:'The well driller', body:['A well driller broke into the main cavern 80 feet down and pulled up gold nuggets on his bit. That night he died of a heart attack. Three weeks later, so did his wife.'] },
+{ t:'story', img:'i2', h:'The well driller', body:['A well driller hit the main cavern 80 feet down and pulled up gold nuggets on his bit. The next day his drill broke off in the hole, and that night he died of a heart attack. Three weeks later, his wife died too.'] },
 
 { t:'story', img:'tooth', h:'The hardest rock', body:['Dad offered Lon ten acres to bring his D8 CAT down and dig. The sandstone was so hard it wore out a $150 penetrating tooth every three days.'] },
 
-{ t:'story', img:'d8', h:'Sand in December', body:['One Monday the D8’s engine died. The mechanic found sand all through it, while snow covered the ground.'] },
+{ t:'story', img:'d8', h:'Sand in December', body:['One Monday in December, the D8’s engine died. The mechanic found sand all through it, with snow covering the ground.'] },
 
 { t:'story', img:'i50', h:'Wilf Blum', body:['A professional treasure diver named Wilf Blum dove the pond in December. That night the bedroom filled with propane, and Mel woke Lon just in time.'] },
 
-{ t:'story', img:'i26', h:'The vomiting man', body:['A radar technician dragging his unit over the cavern collapsed, vomiting. His heart stopped, he fell into a coma, and the doctors never found a cause.'] },
+{ t:'story', img:'i26', h:'The vomiting man', body:['As his radar crossed the edge of the cavern, the technician collapsed, vomiting. His heart stopped, he fell into a coma, and the doctors never found a cause.'] },
 
-{ t:'story', img:'i48', h:'Lightning', body:['A businessman’s drill bit jammed thirty feet down. That night, lightning killed a draft horse, blew out a water pipe, and buried the hole in sand.'] },
+{ t:'story', img:'i48', h:'Lightning', body:['A businessman’s drill bit jammed thirty feet down. That night a storm hit: lightning killed a draft horse and blew out a water pipe, and the rain buried the hole in sand.'] },
 
 { t:'story', img:'i37a', h:'The Rangertell', body:['Steve Schaffer’s friend stood over the cavern with a handheld detector and read gold, silver, diamonds, rubies and emeralds. A few weeks later he died in a motorcycle accident.'] },
 
@@ -75,10 +75,12 @@ const S = [
 
 { t:'gallery', h:'Treasure hunters', sub:'Brandt Child, and Lon Child. Like his father before him.', imgs:['i19','i58'] },
 
-{ t:'plan', img:'i13', h:'Our plan to get Three Lakes back', sub:'Lon’s adventure ranch resort. We’re looking for investors and partners.',
+{ t:'plan', img:'i13', h:'Our plan to get Three Lakes back', sub:'Lon’s adventure ranch resort. Proceeds from the book go to Lon’s mission.',
   list:['Zip-lines and a ropes course','A via ferrata climbing route','Ice climbing on the winter ice walls','Disc golf','A lodge and cabins','Montezuma treasure tours'] },
 
-{ t:'end', cue:'The book · Questions', book2:'Everyone who buys this book goes on the list to hear first about the second: the last ten years, with much more historical research and stories from others who knew Brandt and Lon.' },
+{ t:'end', cue:'The book · Questions',
+  lines:['Proceeds go to Lon’s mission.','Everyone who buys the book gets Lon’s updates, including the second book: the last ten years, with much more historical research and stories from others who knew Brandt and Lon.'],
+  share:'Share it far and wide, anywhere and everywhere.' },
 ];
 
 const cueTitle = s => s.cue || s.h || '';
