@@ -112,7 +112,7 @@ body { margin: 0; background: var(--lake-deep); color: var(--cream); font-family
 
 .video .yt video { width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
 .video .yt { position: relative; }
-.snd { position: absolute; right: 24px; bottom: 24px; font: 700 28px/1 var(--type); letter-spacing: .06em; color: var(--ink); background: var(--gold); border: 0; border-radius: 999px; padding: 18px 28px; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+.snd { position: absolute; right: 24px; top: 24px; font: 700 28px/1 var(--type); letter-spacing: .06em; color: var(--ink); background: var(--gold); border: 0; border-radius: 999px; padding: 18px 28px; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
 .cover .b2 { display: flex; flex-direction: column; gap: 14px; max-width: 900px; padding-top: 30px; border-top: 2px solid rgba(250,165,18,.5); }
 .cover .b2 .body { font-size: 34px; }
 .cover .words { gap: 34px; }
@@ -234,7 +234,7 @@ addEventListener('resize', fit); new ResizeObserver(fit).observe(room); fit();
    (plain)   everyone else: follows along; clips play silently unless they tap for sound */
 const Q = new URLSearchParams(location.search);
 const MODE = Q.has('preview') ? 'preview' : (Q.has('present') || location.protocol === 'file:') ? 'present' : Q.has('screen') ? 'screen' : 'follow';
-const LIVE = `https://ntfy.sh/${LIVE_TOPIC}`;
+const LIVE = `https://ntfy.sh/${Q.get('topic') || LIVE_TOPIC}`;
 const DRIVES = MODE === 'present' || MODE === 'preview';
 let soundOn = MODE !== 'follow';
 
@@ -243,18 +243,24 @@ const clip = { started: false };
 const vid = i => S[i] && S[i].t === 'video' ? els[i].querySelector('video') : null;
 function playClip(i, offset) {
   const v = vid(i); if (!v) return;
+  if (MODE !== 'present' && MODE !== 'preview' && document.hidden) return;   /* never in a hidden tab */
   v.muted = !soundOn;
   if (offset > 0) {
     if (v.readyState >= 1) { try { v.currentTime = offset; } catch (e) {} }
     else v.addEventListener('loadedmetadata', () => { try { v.currentTime = offset; } catch (e) {} }, { once: true });
   }
-  const p = v.play(); if (p && p.catch) p.catch(() => { v.muted = true; v.play().catch(() => {}); });
-  const b = els[i].querySelector('.snd'); if (b) b.hidden = !v.muted;
+  const b = els[i].querySelector('.snd');
+  const p = v.play();
+  if (p && p.catch) p.catch(() => {
+    if (MODE === 'follow') { v.muted = true; v.play().catch(() => {}); if (b) b.hidden = false; }
+    else if (b) { b.textContent = 'Click for sound'; b.hidden = false; }      /* presenter / projector: ask, never go silent */
+  });
+  if (b) b.hidden = !(MODE === 'follow' && v.muted);
 }
 function stopClip(i) { const v = vid(i); if (v) { v.pause(); try { v.currentTime = 0; } catch (e) {} } }
 els.forEach((el, i) => {
   const b = el.querySelector('.snd'); if (!b) return;
-  b.addEventListener('click', e => { e.stopPropagation(); soundOn = true; const v = vid(i); v.muted = false; if (v.paused) v.play().catch(() => {}); b.hidden = true; });
+  b.addEventListener('click', e => { e.stopPropagation(); soundOn = true; const v = vid(i); v.muted = false; v.volume = 1; v.play().catch(() => {}); b.hidden = true; });
 });
 /* unlock sound on this device with one tap: prime both clips inside the gesture */
 function unlock() {
@@ -293,7 +299,8 @@ function follow(d) {
 }
 /* a phone that was asleep or in the background picks the clip up at the right moment when it comes back */
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden || MODE === 'present') return;
+  if (MODE === 'present' || MODE === 'preview') return;
+  if (document.hidden) { els.forEach((el, i) => { const v = vid(i); if (v && !v.paused) v.pause(); }); return; }
   if (lastPlay && lastPlay.s - 1 === cur && S[cur].t === 'video') follow(lastPlay);
   catchUp();
 });
@@ -329,9 +336,10 @@ function go(n, quiet) {
   try { history.replaceState(null, '', location.search + '#' + (cur + 1)); } catch (e) {}
   if (!quiet) announce({ s: cur + 1 });
 }
+function announceClip() { if (S[cur].t === 'video') announce({ s: cur + 1, play: 1 }, true); }
 function forward() {
   if (!DRIVES) return;
-  if (S[cur].t === 'video' && !clip.started) { clip.started = true; playClip(cur, 0); announce({ s: cur + 1, play: 1 }, true); return; }
+  if (S[cur].t === 'video' && !clip.started) { clip.started = true; playClip(cur, 0); return; }
   go(cur + 1);
 }
 function back() { if (DRIVES) go(cur - 1); }
@@ -367,6 +375,7 @@ room.addEventListener('touchend', e => { if (sx === null) return; const dx = e.c
 
 /* ---- start ---- */
 if (MODE === 'follow') els.forEach(el => { const v = el.querySelector('video'); if (v) v.preload = 'none'; });
+if (DRIVES) els.forEach(el => { const v = el.querySelector('video'); if (v) { v.controls = true; v.addEventListener('click', e => e.stopPropagation()); v.addEventListener('play', () => { clip.started = true; announceClip(); }); } });
 const hint = document.getElementById('hint');
 if (DRIVES) hint.textContent = MODE === 'preview' ? 'Preview: nobody follows this page' : 'Presenting: everyone on the link follows you · click or → to advance · F full screen';
 else { document.body.classList.add('follower'); hint.textContent = MODE === 'screen' ? 'Screen: following the presenter' : 'Following the talk live'; }

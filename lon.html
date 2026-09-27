@@ -114,7 +114,7 @@ show(1);
 const live = document.getElementById('live'), liveText = document.getElementById('liveText');
 function setLive(on) { live.classList.toggle('on', on); liveText.textContent = on ? 'Live' : 'Connecting'; }
 
-const BASE = `https://ntfy.sh/${LIVE_TOPIC}`;
+const BASE = `https://ntfy.sh/${new URLSearchParams(location.search).get('topic') || LIVE_TOPIC}`;
 function slideOf(text) { try { const d = JSON.parse(text); return typeof d === 'number' ? d : d && d.s; } catch (e) { return parseInt(text, 10); } }
 async function catchUp() {
   try {
