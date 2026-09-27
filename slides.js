@@ -30,7 +30,7 @@ const S = [
 
 { t:'story', img:'i49', h:'The fifty-fifty deal', body:['Then came the professionals. By June 1990 they were so sure of the gold that they signed a fifty-fifty deal with Brandt. “Today is the day!” they said, and swam into the tunnel.'] },
 
-{ t:'video', yt:'vMEPPwPTPgw', start:2374, end:2588, len:'3:34', cue:'Clip: the divers (3:34)' },
+{ t:'video', src:'clips/clip1.mp4', poster:'clip1-poster', len:'3:34', cue:'Clip: the divers (3:34)' },
 
 { t:'story', img:'i34b', h:'The Childs buy Three Lakes', body:['The divers quit, and the state wouldn’t let him drain the lake. So in September 1990 Brandt and Venice bought it, planning to blast their own tunnel in from the cliff.'] },
 
@@ -62,7 +62,7 @@ const S = [
 
 { t:'story', img:'i38', big:900, h:'Older than Montezuma', body:['Lon believes the treasure is far older than the Aztecs, and may hold records worth more than any gold.'] },
 
-{ t:'video', grp:'Refuge and Resort', yt:'vMEPPwPTPgw', start:2832, end:2860, len:'0:28', cue:'Clip: Brandt in his own voice (0:28)' },
+{ t:'video', grp:'Refuge and Resort', src:'clips/clip2.mp4', poster:'clip2-poster', len:'0:28', cue:'Clip: Brandt in his own voice (0:28)' },
 
 { t:'statement', img:'i45', h:'“A place of refuge and resort.”', cue:'A place of refuge and resort', sub:'What Brandt wanted Three Lakes to be for his family.' },
 
@@ -78,9 +78,7 @@ const S = [
 { t:'plan', img:'i13', h:'Our plan to get Three Lakes back', sub:'Lon’s adventure ranch resort. We’re looking for investors and partners.',
   list:['Zip-lines and a ropes course','A via ferrata climbing route','Ice climbing on the winter ice walls','Disc golf','A lodge and cabins','Montezuma treasure tours'] },
 
-{ t:'story', img:'cover-front', h:'The second book', body:['Everyone who buys this book goes on the list to hear first about the second.','It covers the last ten years, with much more historical research and stories from others who knew Brandt and Lon.'] },
-
-{ t:'end', cue:'Questions' },
+{ t:'end', cue:'The book · Questions', book2:'Everyone who buys this book goes on the list to hear first about the second: the last ten years, with much more historical research and stories from others who knew Brandt and Lon.' },
 ];
 
 const cueTitle = s => s.cue || s.h || '';

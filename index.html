@@ -109,11 +109,26 @@ body { margin: 0; background: var(--lake-deep); color: var(--cream); font-family
 #count { font: 700 14px/1 var(--type); color: var(--mist); background: rgba(11,44,51,.85); padding: 11px 14px; border-radius: 999px; font-variant-numeric: tabular-nums; min-width: 84px; text-align: center; }
 #hint { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); font: 700 14px/1.2 var(--type); letter-spacing: .06em; color: var(--mist); background: rgba(11,44,51,.85); padding: 10px 16px; border-radius: 999px; transition: opacity .6s ease; pointer-events: none; text-align: center; max-width: calc(100% - 32px); }
 #hint.gone { opacity: 0; }
+
+.video .yt video { width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+.video .yt { position: relative; }
+.snd { position: absolute; right: 24px; bottom: 24px; font: 700 28px/1 var(--type); letter-spacing: .06em; color: var(--ink); background: var(--gold); border: 0; border-radius: 999px; padding: 18px 28px; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+.cover .b2 { display: flex; flex-direction: column; gap: 14px; max-width: 900px; padding-top: 30px; border-top: 2px solid rgba(250,165,18,.5); }
+.cover .b2 .body { font-size: 34px; }
+.cover .words { gap: 34px; }
+#gate { position: fixed; inset: 0; z-index: 5; display: flex; align-items: center; justify-content: center; background: rgba(11,44,51,.92); color: var(--cream); font: 700 22px/1.4 var(--type); letter-spacing: .06em; text-align: center; padding: 24px; cursor: pointer; }
+#gate b { display: block; font-family: var(--display); font-weight: 400; font-size: 44px; letter-spacing: 0; color: var(--gold); margin-bottom: 12px; }
+#follow { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: none; align-items: center; gap: 8px; font: 700 13px/1 var(--type); letter-spacing: .12em; text-transform: uppercase; color: var(--mist); background: rgba(11,44,51,.85); padding: 9px 14px; border-radius: 999px; pointer-events: none; }
+#follow i { width: 9px; height: 9px; border-radius: 50%; background: var(--mist); display: block; }
+#follow.on { color: var(--gold); } #follow.on i { background: var(--gold); }
+body.follower #follow { display: flex; }
+body.follower #bar { display: none; }
 </style></head>
 <body>
 <div id="room" tabindex="0" aria-label="The Treasure of Three Lakes Ranch, slideshow">
   <div id="stage"></div>
   <div id="hint">Click or → to advance · ← back · F full screen</div>
+  <div id="follow"><i></i><span id="followText">Connecting to the talk</span></div>
   <div id="bar">
     <button id="prev" type="button" aria-label="Previous slide">‹ Back</button>
     <span id="count">1 / 1</span>
@@ -124,7 +139,6 @@ body { margin: 0; background: var(--lake-deep); color: var(--cream); font-family
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="slides.js"></script>
-<script src="https://www.youtube.com/iframe_api"></script>
 <script>
 const stage = document.getElementById('stage'), room = document.getElementById('room');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
@@ -147,7 +161,8 @@ function build(s, i) {
       h = `${print('cover-front', 1, 'The book cover')}
         <div class="words">${s.t === 'end'
           ? `<h1 class="d">Questions?</h1><p class="by">The Treasure of Three Lakes Ranch, <b>third edition</b></p>
-             ${BOOK ? `<div class="get"><div id="qr" aria-label="QR code for the book"></div><p class="link">${esc(BOOK.replace(/^https?:\/\//, ''))}</p></div>` : ''}`
+             ${BOOK ? `<div class="get"><div id="qr" aria-label="QR code for the book"></div><p class="link">${esc(BOOK.replace(/^https?:\/\//, ''))}</p></div>` : ''}
+             <div class="b2"><div class="tag">The second book</div><p class="body">${esc(s.book2)}</p></div>`
           : `<h1 class="d">The Treasure of <span>Three Lakes</span> Ranch</h1><p class="by">by <b>Levi Judson Harris</b> &amp; <b>Lon Child</b></p>`}</div>`;
       break;
     case 'story':
@@ -173,7 +188,8 @@ function build(s, i) {
         <ul>${s.list.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
       break;
     case 'video':
-      h = `<div class="vw"><div class="yt" style="background-image:url('https://img.youtube.com/vi/${s.yt}/hqdefault.jpg')"></div></div>`;
+      h = `<div class="vw"><div class="yt"><video src="${s.src}" poster="${I(s.poster)}" preload="auto" playsinline></video>
+        <button class="snd" type="button" hidden>Tap for sound</button></div></div>`;
       break;
   }
   el.innerHTML = h;
@@ -193,39 +209,74 @@ function fit() {
 }
 addEventListener('resize', fit); new ResizeObserver(fit).observe(room); fit();
 
-/* ---- the documentary clips: YouTube players through YouTube's own API, made one slide ahead, removed after ---- */
-const clip = { started: false };
-const players = {};
-let ytReady = false;
-window.onYouTubeIframeAPIReady = () => { ytReady = true; loadClip(cur); loadClip(cur + 1); };
-function ytBox(i) { return S[i] && S[i].t === 'video' ? els[i].querySelector('.yt') : null; }
-function loadClip(i) {
-  const box = ytBox(i); if (!box || players[i] || !ytReady) return;
-  const s = S[i];
-  const holder = document.createElement('div'); box.appendChild(holder);
-  players[i] = new YT.Player(holder, {
-    width: '100%', height: '100%', videoId: s.yt,
-    playerVars: { start: s.start, end: s.end, rel: 0, modestbranding: 1, playsinline: 1, origin: location.origin },
-    events: { onReady: e => { players[i].ready = true; if (players[i].wantPlay) e.target.playVideo(); } }
-  });
-}
-function unloadClip(i) { if (players[i]) { try { players[i].destroy(); } catch (e) {} delete players[i]; const box = ytBox(i); if (box) box.innerHTML = ''; } }
-function playClip(i) { const p = players[i]; if (!p) return; if (p.ready) p.playVideo(); else p.wantPlay = true; }
-function pauseClip(i) { const p = players[i]; if (p && p.ready) { try { p.pauseVideo(); } catch (e) {} } }
-/* clicking inside the player moves focus into it; count that as started and take the keys back */
-addEventListener('blur', () => {
-  setTimeout(() => {
-    if (document.activeElement && document.activeElement.tagName === 'IFRAME') { clip.started = true; document.activeElement.blur(); room.focus({ preventScroll: true }); }
-  }, 150);
-});
+/* ---- who this page is: ?present drives the talk; everyone else follows it ----
+   ?present  the presenter: clicks move the slides for everyone and start the clips (with sound)
+   ?screen   a projector computer someone else drives: follows, clips with sound (one click to start)
+   (plain)   everyone else: follows along; clips play silently unless they tap for sound */
+const Q = new URLSearchParams(location.search);
+const MODE = Q.has('present') ? 'present' : Q.has('screen') ? 'screen' : 'follow';
+const LIVE = `https://ntfy.sh/${LIVE_TOPIC}`;
+let soundOn = MODE !== 'follow';
 
-/* ---- live: tell Lon's page which slide is up ---- */
+/* ---- the documentary clips: our own copies, no ads ---- */
+const clip = { started: false };
+const vid = i => S[i] && S[i].t === 'video' ? els[i].querySelector('video') : null;
+function playClip(i, offset) {
+  const v = vid(i); if (!v) return;
+  v.muted = !soundOn;
+  try { if (offset > 0) v.currentTime = offset; } catch (e) {}
+  const p = v.play(); if (p && p.catch) p.catch(() => { v.muted = true; v.play().catch(() => {}); });
+  const b = els[i].querySelector('.snd'); if (b) b.hidden = !v.muted;
+}
+function stopClip(i) { const v = vid(i); if (v) { v.pause(); try { v.currentTime = 0; } catch (e) {} } }
+els.forEach((el, i) => {
+  const b = el.querySelector('.snd'); if (!b) return;
+  b.addEventListener('click', e => { e.stopPropagation(); soundOn = true; const v = vid(i); v.muted = false; if (v.paused) v.play().catch(() => {}); b.hidden = true; });
+});
+/* unlock sound on this device with one tap: prime both clips inside the gesture */
+function unlock() {
+  soundOn = true;
+  S.forEach((s, i) => { const v = vid(i); if (v && v.paused) { v.muted = true; v.play().then(() => { v.pause(); v.currentTime = 0; v.muted = false; }).catch(() => {}); } });
+}
+
+/* ---- live: the presenter announces; everyone else follows ---- */
 let liveTimer = null;
-function announce(n) {
+function announce(msg, now) {
+  if (MODE !== 'present') return;
   clearTimeout(liveTimer);
-  liveTimer = setTimeout(() => {
-    fetch(`https://ntfy.sh/${LIVE_TOPIC}`, { method: 'POST', body: String(n + 1), keepalive: true }).catch(() => {});
-  }, 350);
+  const send = () => fetch(LIVE, { method: 'POST', body: JSON.stringify(msg), keepalive: true }).catch(() => {});
+  if (now) send(); else liveTimer = setTimeout(send, 300);
+}
+function readMsg(m) {
+  let d; try { d = JSON.parse(m.message); } catch (e) { d = { s: parseInt(m.message, 10) }; }
+  if (typeof d === 'number') d = { s: d };
+  return d && d.s >= 1 && d.s <= S.length ? { s: d.s, play: !!d.play, time: m.time } : null;
+}
+function follow(d) {
+  if (MODE === 'present' || !d) return;
+  if (d.s - 1 !== cur) go(d.s - 1, true);
+  if (S[cur].t === 'video' && d.play) {
+    const v = vid(cur), offset = Math.max(0, Date.now() / 1000 - d.time);
+    if (v && v.paused && (!v.duration || offset < v.duration)) playClip(cur, offset < 2 ? 0 : offset);
+  }
+}
+let lastId = null;
+async function catchUp() {
+  try {
+    const r = await fetch(`${LIVE}/json?poll=1&since=12h`, { cache: 'no-store' });
+    const lines = (await r.text()).trim().split('\n').filter(Boolean);
+    let last = null;
+    for (const line of lines) { try { const m = JSON.parse(line); if (m.event === 'message') last = m; } catch (e) {} }
+    if (last && last.id !== lastId) { lastId = last.id; follow(readMsg(last)); }
+  } catch (e) {}
+}
+function listen() {
+  const fl = document.getElementById('follow'), ft = document.getElementById('followText');
+  const es = new EventSource(`${LIVE}/sse`);
+  es.onopen = () => { fl.classList.add('on'); ft.textContent = 'Following the talk live'; catchUp(); };
+  es.onmessage = e => { try { const m = JSON.parse(e.data); if (m.event === 'message') { lastId = m.id; follow(readMsg(m)); } } catch (err) {} };
+  es.onerror = () => { fl.classList.remove('on'); ft.textContent = 'Reconnecting'; };
+  setInterval(catchUp, 20000);
 }
 
 /* ---- moving between slides ---- */
@@ -234,20 +285,20 @@ function go(n, quiet) {
   n = Math.max(0, Math.min(S.length - 1, n));
   if (n === cur && els[cur].classList.contains('on')) return;
   els[cur].classList.remove('on');
-  for (let i = 0; i < S.length; i++) if (S[i].t === 'video' && Math.abs(i - n) > 1) unloadClip(i);
-  if (S[cur].t === 'video' && cur !== n) pauseClip(cur);
+  if (S[cur].t === 'video') stopClip(cur);
   cur = n;
   els[cur].classList.add('on');
   clip.started = false;
-  loadClip(cur); loadClip(cur + 1);
   document.getElementById('count').textContent = `${cur + 1} / ${S.length}`;
-  try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
-  if (!quiet) announce(cur);
+  try { history.replaceState(null, '', location.search + '#' + (cur + 1)); } catch (e) {}
+  if (!quiet) announce({ s: cur + 1 });
 }
 function forward() {
-  if (S[cur].t === 'video' && !clip.started) { clip.started = true; playClip(cur); return; }
+  if (MODE !== 'present') return;
+  if (S[cur].t === 'video' && !clip.started) { clip.started = true; playClip(cur, 0); announce({ s: cur + 1, play: 1 }, true); return; }
   go(cur + 1);
 }
+function back() { if (MODE === 'present') go(cur - 1); }
 
 function full() {
   try {
@@ -256,20 +307,20 @@ function full() {
   } catch (e) {}
 }
 room.addEventListener('click', e => {
-  if (e.target.closest('#bar')) return;
+  if (e.target.closest('#bar') || e.target.closest('.snd')) return;
   room.focus({ preventScroll: true });
   const r = room.getBoundingClientRect();
-  if (e.clientX - r.left < r.width * 0.2) go(cur - 1); else forward();
+  if (e.clientX - r.left < r.width * 0.2) back(); else forward();
 });
-document.getElementById('prev').addEventListener('click', () => go(cur - 1));
-document.getElementById('next').addEventListener('click', () => go(cur + 1));
+document.getElementById('prev').addEventListener('click', back);
+document.getElementById('next').addEventListener('click', () => { if (MODE === 'present') go(cur + 1); });
 document.getElementById('full').addEventListener('click', full);
 addEventListener('keydown', e => {
   const k = e.key;
   if (['ArrowRight', 'PageDown', ' ', 'Enter', 'ArrowDown'].includes(k)) { e.preventDefault(); forward(); }
-  else if (['ArrowLeft', 'PageUp', 'ArrowUp'].includes(k)) { e.preventDefault(); go(cur - 1); }
-  else if (k === 'Home') go(0);
-  else if (k === 'End') go(S.length - 1);
+  else if (['ArrowLeft', 'PageUp', 'ArrowUp'].includes(k)) { e.preventDefault(); back(); }
+  else if (k === 'Home' && MODE === 'present') go(0);
+  else if (k === 'End' && MODE === 'present') go(S.length - 1);
   else if (k === 'f' || k === 'F') full();
 });
 let t; const wake = () => { room.classList.add('awake'); clearTimeout(t); t = setTimeout(() => room.classList.remove('awake'), 1800); };
@@ -277,14 +328,29 @@ room.addEventListener('mousemove', wake);
 let sx = null;
 room.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
 room.addEventListener('touchend', e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; sx = null;
-  if (Math.abs(dx) > 50) { e.preventDefault(); dx < 0 ? go(cur + 1) : go(cur - 1); } });
-setTimeout(() => document.getElementById('hint').classList.add('gone'), 4000);
+  if (Math.abs(dx) > 50) { e.preventDefault(); dx < 0 ? forward() : back(); } });
+
+/* ---- start ---- */
+const hint = document.getElementById('hint');
+if (MODE === 'present') hint.textContent = 'Presenting: everyone on the link follows you · click or → to advance · F full screen';
+else { document.body.classList.add('follower'); hint.textContent = MODE === 'screen' ? 'Screen: following the presenter' : 'Following the talk live'; }
+setTimeout(() => hint.classList.add('gone'), 5000);
 
 const start = parseInt((location.hash || '#1').slice(1), 10);
 cur = isNaN(start) ? 0 : Math.max(0, Math.min(S.length - 1, start - 1));
-els[cur].classList.add('on'); loadClip(cur); loadClip(cur + 1);
+els[cur].classList.add('on');
 document.getElementById('count').textContent = `${cur + 1} / ${S.length}`;
-announce(cur);
+
+if (MODE === 'present') announce({ s: cur + 1 }, true);
+else if (MODE === 'screen') {
+  const gate = document.createElement('div'); gate.id = 'gate';
+  gate.innerHTML = '<div><b>Three Lakes</b>Click once to start the screen.<br>It will follow the presenter, with sound.</div>';
+  document.body.appendChild(gate);
+  gate.addEventListener('click', () => { unlock(); full(); gate.remove(); catchUp(); }, { once: true });
+  listen();
+} else {
+  listen();
+}
 </script>
 </body>
 </html>

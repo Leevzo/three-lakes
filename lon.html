@@ -97,19 +97,20 @@ const live = document.getElementById('live'), liveText = document.getElementById
 function setLive(on) { live.classList.toggle('on', on); liveText.textContent = on ? 'Live' : 'Connecting'; }
 
 const BASE = `https://ntfy.sh/${LIVE_TOPIC}`;
+function slideOf(text) { try { const d = JSON.parse(text); return typeof d === 'number' ? d : d && d.s; } catch (e) { return parseInt(text, 10); } }
 async function catchUp() {
   try {
     const r = await fetch(`${BASE}/json?poll=1&since=12h`, { cache: 'no-store' });
     const lines = (await r.text()).trim().split('\n').filter(Boolean);
     let last = null;
     for (const line of lines) { try { const m = JSON.parse(line); if (m.event === 'message') last = m; } catch (e) {} }
-    if (last && parseInt(last.message, 10) !== current) show(last.message, true);
+    if (last && slideOf(last.message) !== current) show(slideOf(last.message), true);
   } catch (e) {}
 }
 function listen() {
   const es = new EventSource(`${BASE}/sse`);
   es.onopen = () => { setLive(true); catchUp(); };
-  es.onmessage = e => { try { const m = JSON.parse(e.data); if (m.event === 'message') show(m.message, true); } catch (err) {} };
+  es.onmessage = e => { try { const m = JSON.parse(e.data); if (m.event === 'message') show(slideOf(m.message), true); } catch (err) {} };
   es.onerror = () => setLive(false);
 }
 catchUp(); listen();
