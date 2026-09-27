@@ -114,7 +114,6 @@ function listen() {
   es.onerror = () => setLive(false);
 }
 catchUp(); listen();
-setInterval(catchUp, 20000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { catchUp(); keepAwake(); } });
 
 /* keep the phone's screen on while this page is open, where the phone allows it */

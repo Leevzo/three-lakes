@@ -244,7 +244,10 @@ const vid = i => S[i] && S[i].t === 'video' ? els[i].querySelector('video') : nu
 function playClip(i, offset) {
   const v = vid(i); if (!v) return;
   v.muted = !soundOn;
-  try { if (offset > 0) v.currentTime = offset; } catch (e) {}
+  if (offset > 0) {
+    if (v.readyState >= 1) { try { v.currentTime = offset; } catch (e) {} }
+    else v.addEventListener('loadedmetadata', () => { try { v.currentTime = offset; } catch (e) {} }, { once: true });
+  }
   const p = v.play(); if (p && p.catch) p.catch(() => { v.muted = true; v.play().catch(() => {}); });
   const b = els[i].querySelector('.snd'); if (b) b.hidden = !v.muted;
 }
@@ -260,12 +263,18 @@ function unlock() {
 }
 
 /* ---- live: the presenter announces; everyone else follows ---- */
-let liveTimer = null;
+let liveTimer = null, liveSeq = 0;
 function announce(msg, now) {
   if (MODE !== 'present' || location.protocol === 'file:') return;
   clearTimeout(liveTimer);
-  const send = () => fetch(LIVE, { method: 'POST', body: JSON.stringify(msg), keepalive: true }).catch(() => {});
-  if (now) send(); else liveTimer = setTimeout(send, 300);
+  const seq = ++liveSeq;
+  const send = (tries) => {
+    if (seq !== liveSeq) return;                       /* a newer slide has been sent since */
+    fetch(LIVE, { method: 'POST', body: JSON.stringify(msg), keepalive: true })
+      .then(r => { if (!r.ok) throw new Error(r.status); })
+      .catch(() => { if (tries < 6) liveTimer = setTimeout(() => send(tries + 1), 1500 * (tries + 1)); });
+  };
+  if (now) send(0); else liveTimer = setTimeout(() => send(0), 300);
 }
 function readMsg(m) {
   let d; try { d = JSON.parse(m.message); } catch (e) { d = { s: parseInt(m.message, 10) }; }
@@ -304,7 +313,6 @@ function listen() {
   es.onopen = () => { fl.classList.add('on'); ft.textContent = 'Following the talk live'; catchUp(); };
   es.onmessage = e => { try { const m = JSON.parse(e.data); if (m.event === 'message') { lastId = m.id; follow(readMsg(m)); } } catch (err) {} };
   es.onerror = () => { fl.classList.remove('on'); ft.textContent = 'Reconnecting'; };
-  setInterval(catchUp, 20000);
 }
 
 /* ---- moving between slides ---- */
@@ -337,8 +345,7 @@ function full() {
 room.addEventListener('click', e => {
   if (e.target.closest('#bar') || e.target.closest('.snd') || e.target.closest('a')) return;
   room.focus({ preventScroll: true });
-  const r = room.getBoundingClientRect();
-  if (e.clientX - r.left < r.width * 0.2) back(); else forward();
+  forward();
 });
 document.getElementById('prev').addEventListener('click', back);
 document.getElementById('next').addEventListener('click', () => { if (DRIVES) go(cur + 1); });
@@ -359,6 +366,7 @@ room.addEventListener('touchend', e => { if (sx === null) return; const dx = e.c
   if (Math.abs(dx) > 50) { e.preventDefault(); dx < 0 ? forward() : back(); } });
 
 /* ---- start ---- */
+if (MODE === 'follow') els.forEach(el => { const v = el.querySelector('video'); if (v) v.preload = 'none'; });
 const hint = document.getElementById('hint');
 if (DRIVES) hint.textContent = MODE === 'preview' ? 'Preview: nobody follows this page' : 'Presenting: everyone on the link follows you · click or → to advance · F full screen';
 else { document.body.classList.add('follower'); hint.textContent = MODE === 'screen' ? 'Screen: following the presenter' : 'Following the talk live'; }
