@@ -4,8 +4,8 @@
 /* The live channel the slideshow announces its slide on (ntfy.sh, free, no account). */
 const LIVE_TOPIC = 'three-lakes-ranch-lc7q2vx9';
 
-/* The book link for the last slide. Paste it between the quotes; a QR code appears with it. */
-const BOOK = '';
+/* The book on Lulu; its QR code is img/book-qr.png, shown on the first and last slides. */
+const BOOK = 'https://www.lulu.com/shop/levi-harris/the-treasure-of-three-lakes/paperback/product-yvqk5k4.html';
 
 const S = [
 { t:'cover', cue:'Title' },

@@ -123,6 +123,10 @@ body { margin: 0; background: var(--lake-deep); color: var(--cream); font-family
 #follow.on { color: var(--gold); } #follow.on i { background: var(--gold); }
 body.follower #follow { display: flex; }
 body.follower #bar { display: none; }
+.cover .get img.qr { width: 250px; height: 250px; display: block; flex: none; background: #fff; border: 10px solid #fff; box-shadow: 0 16px 36px rgba(0,0,0,.4); image-rendering: pixelated; }
+.cover .gl { display: flex; flex-direction: column; gap: 10px; }
+.cover .gl .lbl { font-family: var(--type); font-weight: 700; font-size: 28px; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); margin: 0; }
+.cover .gl .link { font-family: var(--book); font-style: italic; font-size: 34px; color: var(--cream); margin: 0; word-break: normal; }
 </style></head>
 <body>
 <div id="room" tabindex="0" aria-label="The Treasure of Three Lakes Ranch, slideshow">
@@ -137,7 +141,6 @@ body.follower #bar { display: none; }
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="slides.js"></script>
 <script>
 const stage = document.getElementById('stage'), room = document.getElementById('room');
@@ -161,9 +164,10 @@ function build(s, i) {
       h = `${print('cover-front', 1, 'The book cover')}
         <div class="words">${s.t === 'end'
           ? `<h1 class="d">Questions?</h1><p class="by">The Treasure of Three Lakes Ranch, <b>third edition</b></p>
-             ${BOOK ? `<div class="get"><div id="qr" aria-label="QR code for the book"></div><p class="link">${esc(BOOK.replace(/^https?:\/\//, ''))}</p></div>` : ''}
+             <div class="get"><img class="qr" src="img/book-qr.png" alt="QR code: the book on Lulu"><div class="gl"><p class="lbl">Get the book</p><p class="link">Paperback on lulu.com</p></div></div>
              <div class="b2"><div class="tag">The second book</div><p class="body">${esc(s.book2)}</p></div>`
-          : `<h1 class="d">The Treasure of <span>Three Lakes</span> Ranch</h1><p class="by">by <b>Levi Judson Harris</b> &amp; <b>Lon Child</b></p>`}</div>`;
+          : `<h1 class="d">The Treasure of <span>Three Lakes</span> Ranch</h1><p class="by">by <b>Levi Judson Harris</b> &amp; <b>Lon Child</b></p>
+             <div class="get"><img class="qr" src="img/book-qr.png" alt="QR code: the book on Lulu"><div class="gl"><p class="lbl">Get the book</p><p class="link">Paperback on lulu.com</p></div></div>`}</div>`;
       break;
     case 'story':
       h = `${print(s.img, i, s.h, s.big)}<div class="words">${tag}<h2 class="h">${esc(s.h)}</h2>
@@ -197,9 +201,6 @@ function build(s, i) {
   return el;
 }
 const els = S.map(build);
-if (BOOK && window.QRCode) {
-  try { new QRCode(document.getElementById('qr'), { text: BOOK, width: 300, height: 300, colorDark: '#0F3942', colorLight: '#F6F1E4', correctLevel: QRCode.CorrectLevel.M }); } catch (e) {}
-}
 
 /* ---- fitting the 1920x1080 stage to any screen ---- */
 function fit() {
